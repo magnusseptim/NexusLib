@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using System.Linq;
+using NexusLib.Tools;
 
 namespace NexusLib.Repository
 {
@@ -22,14 +23,18 @@ namespace NexusLib.Repository
         public RequestOptions defaultRequestOptrions { get; private set; }
         public HashSet<DatabaseSchema> Databases  { get; private set; }
         public string ActiveDatabaseID { get; private set; }
+        public string ActiveCollection { get; private set; }
         DocumentClient client;
+        StandardInvocator stdInvocator;
 
 
         public SqlDocumentsDB(string endpointUrl, string primaryKey)
         {
             client = new DocumentClient(new Uri(endpointUrl), primaryKey);
             Databases = new HashSet<DatabaseSchema>();
+            stdInvocator = new StandardInvocator();
             ActiveDatabaseID = "db";
+            ActiveCollection = "defaultCol";
         }
 
         public SqlDocumentsDB(string endpointUrl, string primaryKey, RequestOptions requestOptions)
@@ -37,60 +42,60 @@ namespace NexusLib.Repository
             client = new DocumentClient(new Uri(endpointUrl), primaryKey);
             Databases = new HashSet<DatabaseSchema>();
             ActiveDatabaseID = "db";
+            ActiveCollection = "defaultCol";
             defaultRequestOptrions = new RequestOptions() { OfferThroughput = 2500 };
         }
 
         public Task<BaseResponse<Database>> CreateDatabase(string dbID, string resourceID)
         {
-            BaseResponse<Database> doneCorrect = new BaseResponse<Database>(true);
-            try
+            return stdInvocator.InvokeStandardThreadPoolAction<Database>(() =>
             {
-                ThreadPool.QueueUserWorkItem(async _ =>
-                {
-                    var resourceResponse = await this.client.CreateDatabaseIfNotExistsAsync(
+                return (Task<ResourceResponse<Database>>)this.client.CreateDatabaseIfNotExistsAsync(
                         new Database()
                         {
                             Id = dbID,
                             ResourceId = string.IsNullOrEmpty(resourceID) ? Guid.NewGuid().ToString() : resourceID
+                        }).ContinueWith((x)=> 
+                        {
+                            Databases.Add(new DatabaseSchema() { Database = x.Result});
+                            ActiveDatabaseID = dbID;
                         });
-                    doneCorrect.ResourceResponse = resourceResponse;
-                    Databases.Add(new DatabaseSchema() { Database = doneCorrect.ResourceResponse.Resource });
-                    ActiveDatabaseID = dbID;
-                });
-            }
-            catch (Exception ex)
-            {
-                doneCorrect = new BaseResponse<Database>(false, ex.Message);
-            }
-
-            return Task.FromResult(doneCorrect);
+            });
         }
 
         public Task<BaseResponse<DocumentCollection>> CreateCollection(string colId, string paths, string dbID  = null, RequestOptions reqOptions = null)
         {
-            BaseResponse<DocumentCollection> doneCorrect = new BaseResponse<DocumentCollection>(true);
-            DocumentCollection colect = new DocumentCollection();
-            colect.Id = colId;
-            paths = !paths.Contains("/") ? "/" + paths : paths;
-            colect.PartitionKey.Paths.Add(paths);
-
-            try
+            return stdInvocator.InvokeStandardThreadPoolAction<DocumentCollection>(() =>
             {
-                ThreadPool.QueueUserWorkItem(async _ =>
-                {
-                    var resourceResponse = await client.CreateDocumentCollectionIfNotExistsAsync(
-                            UriFactory.CreateDatabaseUri(string.IsNullOrEmpty(dbID) ? ActiveDatabaseID : dbID),
+                BaseResponse<DocumentCollection> doneCorrect = new BaseResponse<DocumentCollection>(true);
+                DocumentCollection colect = new DocumentCollection();
+                colect.Id = colId;
+                paths = !paths.Contains("/") ? "/" + paths : paths;
+                colect.PartitionKey.Paths.Add(paths);
+
+                return (Task<ResourceResponse<DocumentCollection>>)this.client.CreateDocumentCollectionIfNotExistsAsync(
+                           UriFactory.CreateDatabaseUri(string.IsNullOrEmpty(dbID) ? ActiveDatabaseID : dbID),
                             colect,
                             reqOptions == null ? defaultRequestOptrions : reqOptions
-                        );
-                    Databases.First(x => x.Database.Id == dbID).Collections.Add(resourceResponse);
-                });
-            }
-            catch (Exception ex)
+                        ).ContinueWith((x) =>
+                        {
+                            Databases.First(y => y.Database.Id == dbID).Collections.Add(x.Result);
+                            ActiveCollection = colId;
+                        });
+            });
+
+        }
+
+        public Task<BaseResponse<Document>> CreateDocumentAsync(object document,string colId = null, string dbID = null)
+        {
+            return stdInvocator.InvokeStandardThreadPoolAction<Document>(() =>
             {
-                doneCorrect = new BaseResponse<DocumentCollection>(false, ex.Message);
-            }
-            return Task.FromResult(doneCorrect);
+                return (Task<ResourceResponse<Document>>)this.client.CreateDocumentAsync(
+                            UriFactory.CreateDocumentCollectionUri(
+                                string.IsNullOrEmpty(dbID) ? ActiveDatabaseID : dbID,
+                                string.IsNullOrEmpty(colId) ? ActiveCollection : colId
+                        ), document);
+            });
         }
     }
 }
