@@ -97,5 +97,48 @@ namespace NexusLib.Repository
                         ), document);
             });
         }
+
+        public Task<BaseResponse<Document>> ReadDocumentAsync(string documentID, string partitionKey, string colId = null, string dbID = null)
+        {
+            return stdInvocator.InvokeStandardThreadPoolAction<Document>(() =>
+            {
+                return (Task<ResourceResponse<Document>>)this.client.ReadDocumentAsync(
+                    UriFactory.CreateDocumentUri
+                    (
+                        string.IsNullOrEmpty(dbID) ? ActiveDatabaseID : dbID,
+                        string.IsNullOrEmpty(colId) ? ActiveCollection : colId,
+                        documentID
+                    ), new RequestOptions { PartitionKey = new PartitionKey(partitionKey) });
+            });
+        }
+
+        public Task<BaseResponse<Document>> UpdateDocumentAsync<T>(string documentID, T document, string colId = null, string dbID = null)
+        {
+            return stdInvocator.InvokeStandardThreadPoolAction<Document>(() =>
+            {
+                return (Task<ResourceResponse<Document>>)this.client.ReplaceDocumentAsync(
+                    UriFactory.CreateDocumentUri
+                    (
+                        string.IsNullOrEmpty(dbID) ? ActiveDatabaseID : dbID,
+                        string.IsNullOrEmpty(colId) ? ActiveCollection : colId,
+                        documentID
+                    ),document);
+            });
+        }
+
+        public Task<BaseResponse<Document>> DeleteDocumentAsync(string documentID, string partitionKey, string colId = null, string dbID = null)
+        {
+            return stdInvocator.InvokeStandardThreadPoolAction<Document>(() =>
+            {
+                return (Task<ResourceResponse<Document>>)this.client.DeleteDocumentAsync(
+                    UriFactory.CreateDocumentUri
+                    (
+                        string.IsNullOrEmpty(dbID) ? ActiveDatabaseID : dbID,
+                        string.IsNullOrEmpty(colId) ? ActiveCollection : colId,
+                        documentID
+                    ), new RequestOptions { PartitionKey = new PartitionKey(partitionKey) });
+            });
+        }
+
     }
 }
