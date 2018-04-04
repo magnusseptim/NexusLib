@@ -12,7 +12,7 @@ namespace ExperimentalField
     {
         static void Main(string[] args)
         {
-            TypeBuilders builder = new TypeBuilders();
+            TypeBuilders builder = new TypeBuilders(MethodAttributes.Public);
 
             Type ourType = builder.BuildType("testtype",
                                               new List<PropertyModel>()

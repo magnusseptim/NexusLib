@@ -46,21 +46,27 @@ namespace NexusLib.Repository
             defaultRequestOptrions = new RequestOptions() { OfferThroughput = 2500 };
         }
 
-        public Task<BaseResponse<Database>> CreateDatabase(string dbID, string resourceID)
+        public Task CreateDatabase(string dbID, string resourceID)
         {
-            return stdInvocator.InvokeStandardThreadPoolAction<Database>(() =>
+
+            try
             {
-                return (Task<ResourceResponse<Database>>)this.client.CreateDatabaseIfNotExistsAsync(
-                        new Database()
-                        {
-                            Id = dbID,
-                            ResourceId = string.IsNullOrEmpty(resourceID) ? Guid.NewGuid().ToString() : resourceID
-                        }).ContinueWith((x)=> 
-                        {
-                            Databases.Add(new DatabaseSchema() { Database = x.Result});
-                            ActiveDatabaseID = dbID;
-                        });
-            });
+               return this.client.CreateDatabaseIfNotExistsAsync(
+               new Database()
+               {
+                   Id = dbID,
+                   ResourceId = string.IsNullOrEmpty(resourceID) ? Guid.NewGuid().ToString() : resourceID
+               }).ContinueWith((x) =>
+               {
+                   Databases.Add(new DatabaseSchema() { Database = x.Result });
+                   ActiveDatabaseID = dbID;
+               });
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public Task<BaseResponse<DocumentCollection>> CreateCollection(string colId, string paths, string dbID  = null, RequestOptions reqOptions = null)
