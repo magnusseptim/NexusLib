@@ -10,25 +10,21 @@ namespace NexusLib.Tools
 {
     public class StandardInvocator
     {
-        public Task<BaseResponse<BaseResponseGenericType>> InvokeStandardThreadPoolAction<BaseResponseGenericType>(Func<Task<ResourceResponse<BaseResponseGenericType>>> func) 
+        public async Task<BaseResponse<BaseResponseGenericType>> InvokeStandardThreadPoolAction<BaseResponseGenericType>(Func<Task<ResourceResponse<BaseResponseGenericType>>> func) 
             where BaseResponseGenericType : Microsoft.Azure.Documents.Resource, new()
         {
             BaseResponse<BaseResponseGenericType> doneCorrect = new BaseResponse<BaseResponseGenericType>(true);
             try
             {
-                ThreadPool.QueueUserWorkItem(async _ =>
-                {
-                    var resourceResponse = await func();
-                    doneCorrect = new BaseResponse<BaseResponseGenericType>(true);
-                    doneCorrect.ResourceResponse = resourceResponse;
-                });
+                doneCorrect = new BaseResponse<BaseResponseGenericType>(true);
+                doneCorrect.ResourceResponse =  await func();
             }
             catch (Exception ex)
             {
                 doneCorrect = new BaseResponse<BaseResponseGenericType>(false, ex.Message);
             }
 
-            return Task.FromResult(doneCorrect);
+            return doneCorrect;
         }
     }
 }

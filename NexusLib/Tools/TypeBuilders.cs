@@ -26,7 +26,7 @@ namespace NexusLib.Tools
         IList<Type> CreatedTypes { get; set; }
         MethodAttributes getSetAttr;
 
-        public TypeBuilders(MethodAttributes? getSetAttr)
+        public TypeBuilders(MethodAttributes? getSetAttr = null)
         {
             CreatedTypes = new List<Type>();
             // Another attributes that should be optional in future
@@ -66,7 +66,7 @@ namespace NexusLib.Tools
                 // property has no parameters. (If you don't specify null, you must
                 // specify an array of Type objects. For a parameterless property,
                 // use an array with no elements: new Type[] {})
-                propertyBuilder = typeBuilder.DefineProperty(property.Name, property.Attribute, property.PropertyType, null);
+                propertyBuilder = typeBuilder.DefineProperty(char.ToUpper(property.Name[0]) + property.Name.Substring(1), property.Attribute, property.PropertyType, null);
 
                 // define get attribute
                 // define set attribute
@@ -94,7 +94,7 @@ namespace NexusLib.Tools
 
         private MethodBuilder BuildGetProperty(TypeBuilder typeBuilder, PropertyModel property)
         {
-            methodGetBuilder = typeBuilder.DefineMethod("get_" + property.Name, getSetAttr, property.PropertyType, Type.EmptyTypes);
+            methodGetBuilder = typeBuilder.DefineMethod("get_" + char.ToUpper(property.Name[0]) + property.Name.Substring(1), getSetAttr, property.PropertyType, Type.EmptyTypes);
 
             // build "get" il generator
             getGenerator = methodGetBuilder.GetILGenerator();
@@ -107,7 +107,7 @@ namespace NexusLib.Tools
 
         private MethodBuilder BuildSetProperty(TypeBuilder typeBuilder, PropertyModel property)
         {
-            methodSetBuilder = typeBuilder.DefineMethod("set_" + property.Name,
+            methodSetBuilder = typeBuilder.DefineMethod("set_" + char.ToUpper(property.Name[0]) + property.Name.Substring(1),
                                         getSetAttr,
                                         null,
                                         new Type[] { property.PropertyType });
@@ -119,7 +119,7 @@ namespace NexusLib.Tools
             setGenerator.Emit(OpCodes.Stfld, fieldBuilder);
             setGenerator.Emit(OpCodes.Ret);
 
-            return methodGetBuilder;
+            return methodSetBuilder;
         }
 
         private FieldBuilder BuildUnderlyingField(TypeBuilder typeBuilder, PropertyModel property)

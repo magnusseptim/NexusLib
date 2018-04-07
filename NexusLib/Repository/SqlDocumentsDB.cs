@@ -35,6 +35,7 @@ namespace NexusLib.Repository
             stdInvocator = new StandardInvocator();
             ActiveDatabaseID = "db";
             ActiveCollection = "defaultCol";
+            defaultRequestOptrions = new RequestOptions() { OfferThroughput = 2500 };
         }
 
         public SqlDocumentsDB(string endpointUrl, string primaryKey, RequestOptions requestOptions)
@@ -71,28 +72,25 @@ namespace NexusLib.Repository
 
         public Task<BaseResponse<DocumentCollection>> CreateCollection(string colId, string paths, string dbID  = null, RequestOptions reqOptions = null)
         {
+
             return stdInvocator.InvokeStandardThreadPoolAction<DocumentCollection>(() =>
-            {
-                BaseResponse<DocumentCollection> doneCorrect = new BaseResponse<DocumentCollection>(true);
-                DocumentCollection colect = new DocumentCollection();
-                colect.Id = colId;
-                paths = !paths.Contains("/") ? "/" + paths : paths;
-                colect.PartitionKey.Paths.Add(paths);
+                {
+                    BaseResponse<DocumentCollection> doneCorrect = new BaseResponse<DocumentCollection>(true);
+                    DocumentCollection colect = new DocumentCollection();
+                    colect.Id = colId;
+                    paths = !paths.Contains("/") ? "/" + paths : paths;
+                    colect.PartitionKey.Paths.Add(paths);
 
-                return (Task<ResourceResponse<DocumentCollection>>)this.client.CreateDocumentCollectionIfNotExistsAsync(
-                           UriFactory.CreateDatabaseUri(string.IsNullOrEmpty(dbID) ? ActiveDatabaseID : dbID),
-                            colect,
-                            reqOptions == null ? defaultRequestOptrions : reqOptions
-                        ).ContinueWith((x) =>
-                        {
-                            Databases.First(y => y.Database.Id == dbID).Collections.Add(x.Result);
-                            ActiveCollection = colId;
-                        });
-            });
-
+                    return this.client.CreateDocumentCollectionIfNotExistsAsync(
+                               UriFactory.CreateDatabaseUri(string.IsNullOrEmpty(dbID) ? ActiveDatabaseID : dbID),
+                                colect,
+                                reqOptions == null ? defaultRequestOptrions : reqOptions
+                            );
+                }).RunMultiThread();
+          
         }
 
-        public Task<BaseResponse<Document>> CreateDocumentAsync(object document,string colId = null, string dbID = null)
+        public Task<BaseResponse<Document>> CreateDocumentAsync(object document, string colId = null, string dbID = null)
         {
             return stdInvocator.InvokeStandardThreadPoolAction<Document>(() =>
             {
@@ -101,7 +99,7 @@ namespace NexusLib.Repository
                                 string.IsNullOrEmpty(dbID) ? ActiveDatabaseID : dbID,
                                 string.IsNullOrEmpty(colId) ? ActiveCollection : colId
                         ), document);
-            });
+            }).RunMultiThread();
         }
 
         public Task<BaseResponse<Document>> ReadDocumentAsync(string documentID, string partitionKey, string colId = null, string dbID = null)
@@ -115,7 +113,7 @@ namespace NexusLib.Repository
                         string.IsNullOrEmpty(colId) ? ActiveCollection : colId,
                         documentID
                     ), new RequestOptions { PartitionKey = new PartitionKey(partitionKey) });
-            });
+            }).RunMultiThread();
         }
 
         public Task<BaseResponse<Document>> UpdateDocumentAsync<T>(string documentID, T document, string colId = null, string dbID = null)
@@ -128,8 +126,8 @@ namespace NexusLib.Repository
                         string.IsNullOrEmpty(dbID) ? ActiveDatabaseID : dbID,
                         string.IsNullOrEmpty(colId) ? ActiveCollection : colId,
                         documentID
-                    ),document);
-            });
+                    ), document);
+            }).RunMultiThread();
         }
 
         public Task<BaseResponse<Document>> DeleteDocumentAsync(string documentID, string partitionKey, string colId = null, string dbID = null)
@@ -143,8 +141,7 @@ namespace NexusLib.Repository
                         string.IsNullOrEmpty(colId) ? ActiveCollection : colId,
                         documentID
                     ), new RequestOptions { PartitionKey = new PartitionKey(partitionKey) });
-            });
+            }).RunMultiThread();
         }
-
     }
 }
