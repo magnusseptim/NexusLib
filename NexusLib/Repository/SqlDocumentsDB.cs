@@ -143,5 +143,17 @@ namespace NexusLib.Repository
                     ), new RequestOptions { PartitionKey = new PartitionKey(partitionKey) });
             }).RunMultiThread();
         }
+
+        public Task<IQueryable<object>> QueryPartitionedDocument(object document, string propertyName, object compareObject, string colId = null, string dbID = null)
+        {
+            return Task.Run(() =>
+            {
+                return client.CreateDocumentQuery<object>(UriFactory.CreateDocumentCollectionUri
+                   (
+                       string.IsNullOrEmpty(dbID) ? ActiveDatabaseID : dbID,
+                       string.IsNullOrEmpty(colId) ? ActiveCollection : colId
+                   )).Where(x => x.GetType().GetProperty(propertyName).GetValue(document) == compareObject);
+            });
+        }
     }
 }
