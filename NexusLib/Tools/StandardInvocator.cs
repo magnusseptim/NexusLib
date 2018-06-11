@@ -1,23 +1,23 @@
 ﻿using Microsoft.Azure.Documents.Client;
 using NexusLib.Model;
+using NexusLib.Tools.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace NexusLib.Tools
 {
-    public class StandardInvocator
+    public class StandardInvocator : IStandardInvocator
     {
-        public async Task<BaseResponse<BaseResponseGenericType>> InvokeStandardThreadPoolAction<BaseResponseGenericType>(Func<Task<ResourceResponse<BaseResponseGenericType>>> func) 
+        public async Task<BaseResponse<BaseResponseGenericType>> InvokeStandardThreadPoolAction<BaseResponseGenericType>(Func<Task<ResourceResponse<BaseResponseGenericType>>> func)
             where BaseResponseGenericType : Microsoft.Azure.Documents.Resource, new()
         {
             BaseResponse<BaseResponseGenericType> doneCorrect = new BaseResponse<BaseResponseGenericType>(true);
             try
             {
-                doneCorrect = new BaseResponse<BaseResponseGenericType>(true);
-                doneCorrect.ResourceResponse =  await func();
+                doneCorrect = new BaseResponse<BaseResponseGenericType>(true)
+                {
+                    ResourceResponse = await func()
+                };
             }
             catch (Exception ex)
             {
@@ -25,6 +25,32 @@ namespace NexusLib.Tools
             }
 
             return doneCorrect;
+        }
+
+        public async Task<FeedResponse<BaseResponseGenericType>> InvokeStandardThreadPoolAction<BaseResponseGenericType>(Func<Task<FeedResponse<BaseResponseGenericType>>> func)
+          where BaseResponseGenericType : Microsoft.Azure.Documents.Resource, new()
+        {
+            FeedResponse<BaseResponseGenericType> doneCorrect = new FeedResponse<BaseResponseGenericType>();
+            try
+            {
+                doneCorrect = await func();
+            }
+            catch (Exception)
+            {
+                doneCorrect = new FeedResponse<BaseResponseGenericType>();
+            }
+
+            return doneCorrect;
+        }
+
+        public Task<BaseResponse<BaseResponseGenericType>> GetDefaultRespone<BaseResponseGenericType>()
+            where BaseResponseGenericType : Microsoft.Azure.Documents.Resource, new()
+        {
+            return new Task<BaseResponse<BaseResponseGenericType>>(() =>
+            {
+                // TODO : Magic string to remove!
+                return new BaseResponse<BaseResponseGenericType>(false, "No work was done");
+            });
         }
     }
 }

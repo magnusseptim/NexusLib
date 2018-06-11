@@ -14,7 +14,7 @@ namespace NexusTests
     public class SqlDocumentsDbTests
     {
 
-        NexusLib.Repository.SqlDocumentsDB sqlDocumentsDB = new NexusLib.Repository.SqlDocumentsDB("","");
+        NexusLib.Repository.SqlDocumentsDB sqlDocumentsDB = new NexusLib.Repository.SqlDocumentsDB(new StandardInvocator(),null,"","");
         [Fact]
         public void CheckIfDatabaseIsInitialisedCorrect()
         {
