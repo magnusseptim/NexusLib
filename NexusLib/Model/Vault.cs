@@ -17,5 +17,26 @@
         public const string SwaggerTitleKey = "Title";
         public const string SwaggerJsonPath = "SwaggerJsonPath";
         public const string SwaggerAPIName = "SwaggerAPIName";
+
+        public class SqlDocumentDB
+        {
+            public const string ErrorDeleteDatabaseMessage = "Database {0} delete failed";
+            public const string ErrorCreateCollectionMessage = "Create Collection {0} was failed";
+            public const string ErrorDeleteCollectionMessage = "Delete Collection {0} was failed";
+            public const string ErrorCreateDocumentAsyncMessage = "Create Document type of {0} failed";
+            public const string ErrorDeleteDocumentAsyncMessage = "Delete Document {0} failed";
+            public const string ErrorDocumentUriBuilderMessage = "Uri creation failed";
+        }
+
+        public class StandardInvocator
+        {
+            public const string ErrorGetDefaultResponeMessage = "No work was done";
+        }
+
+        public class TypeBuilders
+        {
+            public const string GetPropertyPrefixText = "get_";
+            public const string SetPropertyPrefixText = "set_";
+        }
     }
 }

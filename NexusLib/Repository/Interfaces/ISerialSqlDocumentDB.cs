@@ -12,7 +12,7 @@ namespace NexusLib.Repository.Interfaces
         IList<Task<BaseResponse<DocumentCollection>>> DeleteCollections(IEnumerable<(string databaseID, string collectionID)> collectionParams);
         IList<Task<BaseResponse<Document>>> CreateDocuments(IEnumerable<(object document, string collectionID, string databaseID)> documentsParams);
         IList<Task<BaseResponse<Document>>> DeleteDocuments(IEnumerable<(string documentID, string collectionID, string databaseID)> documentsParams);
-        IList<Task<BaseResponse<Document>>> ReadDocuments(IEnumerable<(string documentID, string partitionKey, string colId, string dbID)> documentParams);
-        IList<Task<BaseResponse<Document>>> UpdateDocuments<DocumentType>(IEnumerable<(string documentID, DocumentType document, string colId, string dbID)> documentParams);
+        IList<Task<BaseResponse<Document>>> ReadDocuments(IEnumerable<(string documentID, string partitionKey, string colId, string dbID)> documentsParams);
+        IList<Task<BaseResponse<Document>>> UpdateDocuments<DocumentType>(IEnumerable<(string documentID, DocumentType document, string colId, string dbID)> documentsParams);
     }
 }

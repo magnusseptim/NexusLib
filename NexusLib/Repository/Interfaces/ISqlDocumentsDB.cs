@@ -21,6 +21,7 @@ namespace NexusLib.Repository.Interfaces
         Task<BaseResponse<Document>> DeleteDocumentAsync(string documentID, string partitionKey, string colId = null, string dbID = null);
         Task<BaseResponse<User>> ReplaceUserAsync(User userToAdd, string dbID = null, RequestOptions options = null);
         Task<BaseResponse<User>> UpsertUserAsync(User userToAdd, string dbID = null, RequestOptions options = null);
+        Task<BaseResponse<User>> DeleteUserAsync(string dbID = null, string userId = null);  
         Task<BaseResponse<Attachment>> AddAttachmentToExistingDocument(string documentID, object attachment, string colId = null, string dbID = null, RequestOptions options = null);
         Task<BaseResponse<Attachment>> AddAttachmentToExistingDocument(Uri uri, System.IO.Stream attachment, RequestOptions requestOptions = null, MediaOptions mediaOptions = null);
         Task<BaseResponse<Attachment>> DeleteAttachmentAsync(Uri uri, RequestOptions requestOptions = null, MediaOptions mediaOptions = null);
@@ -40,6 +41,7 @@ namespace NexusLib.Repository.Interfaces
         Task<BaseResponse<UserDefinedFunction>> CreateUserDefinedFunctionAsync(Uri uri, UserDefinedFunction userDefinedFunction, RequestOptions requestOptions = null);
         Task<BaseResponse<UserDefinedFunction>> CreateUserDefinedFunctionAsync(string collectionLink, UserDefinedFunction userDefinedFunction, RequestOptions requestOptions = null);
         Task<BaseResponse<UserDefinedFunction>> DeleteUserDefinedFunctionAsync(Uri uri, RequestOptions requestOptions = null);
+        Task<BaseResponse<User>> CreateUserAsync(User userToAdd, string dbID = null, RequestOptions options = null);
         Task<IQueryable<object>> QueryPartitionedDocument(object document, string propertyName, object compareObject, string colId = null, string dbID = null);
         IEnumerable<dynamic> ExecuteQuery(string collectionName, Func<dynamic, bool> where);
         IEnumerable<dynamic> ExecuteQuery(string collectionName);

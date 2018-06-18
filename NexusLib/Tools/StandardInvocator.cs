@@ -48,8 +48,7 @@ namespace NexusLib.Tools
         {
             return new Task<BaseResponse<BaseResponseGenericType>>(() =>
             {
-                // TODO : Magic string to remove!
-                return new BaseResponse<BaseResponseGenericType>(false, "No work was done");
+                return new BaseResponse<BaseResponseGenericType>(false, Vault.StandardInvocator.ErrorGetDefaultResponeMessage);
             });
         }
     }

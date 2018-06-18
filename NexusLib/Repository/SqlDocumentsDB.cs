@@ -85,7 +85,7 @@ namespace NexusLib.Repository
                 // Or Logger task in case of failed
                 returned = Task.Factory.StartNew(() =>
                 {
-                    logger.Error(ex, $"Database {dbID} delete failed");
+                    logger.Error(ex, string.Format(Vault.SqlDocumentDB.ErrorDeleteDatabaseMessage, dbID));
                 });
             }
 
@@ -108,8 +108,10 @@ namespace NexusLib.Repository
                 returned = stdInvocator.InvokeStandardThreadPoolAction<DocumentCollection>(() =>
                 {
                     BaseResponse<DocumentCollection> doneCorrect = new BaseResponse<DocumentCollection>(true);
-                    DocumentCollection colect = new DocumentCollection();
-                    colect.Id = colId;
+                    DocumentCollection colect = new DocumentCollection
+                    {
+                        Id = colId
+                    };
                     partitionKeyPath = !partitionKeyPath.Contains("/") ? "/" + partitionKeyPath : partitionKeyPath;
                     colect.PartitionKey.Paths.Add(partitionKeyPath);
 
@@ -121,7 +123,7 @@ namespace NexusLib.Repository
             }
             catch (Exception ex)
             {
-                logger.Error(ex, $"Create Collection {colId} was failed");
+                logger.Error(ex, string.Format(Vault.SqlDocumentDB.ErrorCreateCollectionMessage,colId));
             }
 
             return returned;
@@ -149,7 +151,7 @@ namespace NexusLib.Repository
             }
             catch (Exception ex)
             {
-                logger.Error(ex, $"Delete Collection {colId} was failed");
+                logger.Error(ex, string.Format( Vault.SqlDocumentDB.ErrorDeleteCollectionMessage,colId ));
             }
 
             return returned;
@@ -178,7 +180,7 @@ namespace NexusLib.Repository
             }
             catch (Exception ex)
             {
-                logger.Error(ex, $"Create Document type of { document.GetType().ToString()} failed");
+                logger.Error(ex, string.Format(Vault.SqlDocumentDB.ErrorCreateDocumentAsyncMessage, document.GetType().ToString()));
             }
             return returned;
         }
@@ -198,6 +200,14 @@ namespace NexusLib.Repository
             }).RunMultiThread();
         }
 
+        public Task<BaseResponse<User>> DeleteUserAsync(string dbID = null, string userId = null)
+        {
+            return stdInvocator.InvokeStandardThreadPoolAction<User>(() =>
+            {
+                return (Task<ResourceResponse<User>>)this.Client.DeleteUserAsync(UriFactory.CreateUserUri(dbID, userId));
+            }).RunMultiThread();
+        }
+        
         /// <summary>
         /// Delete Document by using async request
         /// </summary>
@@ -221,11 +231,10 @@ namespace NexusLib.Repository
             }
             catch (Exception ex)
             {
-                logger.Error(ex, $"Delete Document { documentId } failed");
+                logger.Error(ex,string.Format(Vault.SqlDocumentDB.ErrorDeleteDocumentAsyncMessage,documentId));
             }
             return returned;
         }
-
 
         /// <summary>
         /// Read document asynchronusly fromm choosed db/collection
@@ -477,6 +486,7 @@ namespace NexusLib.Repository
                        string.IsNullOrEmpty(colId) ? ActiveCollection : colId
                    )).Where(x => x.GetType().GetProperty(propertyName).GetValue(document) == compareObject);
             });
+
         public IEnumerable<dynamic> ExecuteQuery(string collectionName, Func<dynamic, bool> where)
         {
             IQueryable<dynamic> Query = where == null ? this.Client.CreateDocumentQuery<dynamic>(
@@ -489,11 +499,9 @@ namespace NexusLib.Repository
                 yield return entity;
             }
         }
+
         public IEnumerable<dynamic> ExecuteQuery(string collectionName)
             => ExecuteQuery(collectionName, null);
-
-
-
 
         /// <summary>
         /// Create Document URI
@@ -515,7 +523,7 @@ namespace NexusLib.Repository
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Uri creation failed");
+                logger.Error(ex, Vault.SqlDocumentDB.ErrorDocumentUriBuilderMessage);
                 returned = null;
             }
             return returned;

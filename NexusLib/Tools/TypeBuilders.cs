@@ -1,10 +1,8 @@
 ﻿using NexusLib.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
 using System.Threading;
 
 namespace NexusLib.Tools
@@ -94,7 +92,7 @@ namespace NexusLib.Tools
 
         private MethodBuilder BuildGetProperty(TypeBuilder typeBuilder, PropertyModel property)
         {
-            methodGetBuilder = typeBuilder.DefineMethod("get_" + char.ToUpper(property.Name[0]) + property.Name.Substring(1), getSetAttr, property.PropertyType, Type.EmptyTypes);
+            methodGetBuilder = typeBuilder.DefineMethod(Vault.TypeBuilders.GetPropertyPrefixText + char.ToUpper(property.Name[0]) + property.Name.Substring(1), getSetAttr, property.PropertyType, Type.EmptyTypes);
 
             // build "get" il generator
             getGenerator = methodGetBuilder.GetILGenerator();
@@ -107,7 +105,7 @@ namespace NexusLib.Tools
 
         private MethodBuilder BuildSetProperty(TypeBuilder typeBuilder, PropertyModel property)
         {
-            methodSetBuilder = typeBuilder.DefineMethod("set_" + char.ToUpper(property.Name[0]) + property.Name.Substring(1),
+            methodSetBuilder = typeBuilder.DefineMethod(Vault.TypeBuilders.SetPropertyPrefixText + char.ToUpper(property.Name[0]) + property.Name.Substring(1),
                                         getSetAttr,
                                         null,
                                         new Type[] { property.PropertyType });
