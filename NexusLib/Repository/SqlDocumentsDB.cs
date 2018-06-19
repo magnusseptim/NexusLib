@@ -16,16 +16,16 @@ namespace NexusLib.Repository
     /// </summary>
     public class SqlDocumentsDB : ISqlDocumentsDB
     {
-        public RequestOptions DefaultRequestOptrions { get; private set; }
-        public HashSet<DatabaseSchema> Databases { get; private set; }
-        public string ActiveDatabaseID { get; private set; }
-        public string ActiveCollection { get; private set; }
+        internal RequestOptions DefaultRequestOptrions { get; set; }
+        internal HashSet<DatabaseSchema> Databases { get; set; }
+        internal string ActiveDatabaseID { get; set; }
+        internal string ActiveCollection { get; set; }
 
-        public DocumentClient Client { get; }
-        IStandardInvocator stdInvocator;
-        NLog.Logger logger;
+        internal DocumentClient Client { get; set; }
+        internal IStandardInvocator stdInvocator;
+        internal NLog.Logger logger;
 
-
+        // TODO : Mayby some DI, my Lord ? 
         public SqlDocumentsDB(IStandardInvocator standardInvocator, NLog.Logger logger, string endpointUrl, string primaryKey, int offerThroughput = 2500)
         {
             this.stdInvocator = standardInvocator;
@@ -527,6 +527,11 @@ namespace NexusLib.Repository
                 returned = null;
             }
             return returned;
+        }
+
+        public static SqlDocumentBuilder Build()
+        {
+            return SqlDocumentBuilder.BuildBareObject();
         }
     }
 }
