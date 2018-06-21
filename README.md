@@ -1,7 +1,5 @@
 # NexusLib
-Azure DB client whitch is used by me basicly 
-to test new-learned features founded in Azure platform
-(for this moment strongly focused on CosmosDB)
+Azure DB client which is used by me basically to test new-learned features founded in Azure platform (for this moment strongly focused on CosmosDB)
 
 #TODO list:
 - [ ] Test base client functionalites
