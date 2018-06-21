@@ -85,7 +85,7 @@ namespace NexusLib.Repository
                 // Or Logger task in case of failed
                 returned = Task.Factory.StartNew(() =>
                 {
-                    logger.Error(ex, string.Format(Vault.SqlDocumentDB.ErrorDeleteDatabaseMessage, dbID));
+                    logger.Error(ex, string.Format(Vault.VSqlDocumentDB.ErrorDeleteDatabaseMessage, dbID));
                 });
             }
 
@@ -123,7 +123,7 @@ namespace NexusLib.Repository
             }
             catch (Exception ex)
             {
-                logger.Error(ex, string.Format(Vault.SqlDocumentDB.ErrorCreateCollectionMessage,colId));
+                logger.Error(ex, string.Format(Vault.VSqlDocumentDB.ErrorCreateCollectionMessage,colId));
             }
 
             return returned;
@@ -151,7 +151,7 @@ namespace NexusLib.Repository
             }
             catch (Exception ex)
             {
-                logger.Error(ex, string.Format( Vault.SqlDocumentDB.ErrorDeleteCollectionMessage,colId ));
+                logger.Error(ex, string.Format( Vault.VSqlDocumentDB.ErrorDeleteCollectionMessage,colId ));
             }
 
             return returned;
@@ -180,7 +180,7 @@ namespace NexusLib.Repository
             }
             catch (Exception ex)
             {
-                logger.Error(ex, string.Format(Vault.SqlDocumentDB.ErrorCreateDocumentAsyncMessage, document.GetType().ToString()));
+                logger.Error(ex, string.Format(Vault.VSqlDocumentDB.ErrorCreateDocumentAsyncMessage, document.GetType().ToString()));
             }
             return returned;
         }
@@ -231,7 +231,7 @@ namespace NexusLib.Repository
             }
             catch (Exception ex)
             {
-                logger.Error(ex,string.Format(Vault.SqlDocumentDB.ErrorDeleteDocumentAsyncMessage,documentId));
+                logger.Error(ex,string.Format(Vault.VSqlDocumentDB.ErrorDeleteDocumentAsyncMessage,documentId));
             }
             return returned;
         }
@@ -523,7 +523,7 @@ namespace NexusLib.Repository
             }
             catch (Exception ex)
             {
-                logger.Error(ex, Vault.SqlDocumentDB.ErrorDocumentUriBuilderMessage);
+                logger.Error(ex, Vault.VSqlDocumentDB.ErrorDocumentUriBuilderMessage);
                 returned = null;
             }
             return returned;

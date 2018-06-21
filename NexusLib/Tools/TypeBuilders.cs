@@ -92,7 +92,7 @@ namespace NexusLib.Tools
 
         private MethodBuilder BuildGetProperty(TypeBuilder typeBuilder, PropertyModel property)
         {
-            methodGetBuilder = typeBuilder.DefineMethod(Vault.TypeBuilders.GetPropertyPrefixText + char.ToUpper(property.Name[0]) + property.Name.Substring(1), getSetAttr, property.PropertyType, Type.EmptyTypes);
+            methodGetBuilder = typeBuilder.DefineMethod(Vault.VTypeBuilders.GetPropertyPrefixText + char.ToUpper(property.Name[0]) + property.Name.Substring(1), getSetAttr, property.PropertyType, Type.EmptyTypes);
 
             // build "get" il generator
             getGenerator = methodGetBuilder.GetILGenerator();
@@ -105,7 +105,7 @@ namespace NexusLib.Tools
 
         private MethodBuilder BuildSetProperty(TypeBuilder typeBuilder, PropertyModel property)
         {
-            methodSetBuilder = typeBuilder.DefineMethod(Vault.TypeBuilders.SetPropertyPrefixText + char.ToUpper(property.Name[0]) + property.Name.Substring(1),
+            methodSetBuilder = typeBuilder.DefineMethod(Vault.VTypeBuilders.SetPropertyPrefixText + char.ToUpper(property.Name[0]) + property.Name.Substring(1),
                                         getSetAttr,
                                         null,
                                         new Type[] { property.PropertyType });

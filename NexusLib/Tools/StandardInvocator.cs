@@ -48,7 +48,7 @@ namespace NexusLib.Tools
         {
             return new Task<BaseResponse<BaseResponseGenericType>>(() =>
             {
-                return new BaseResponse<BaseResponseGenericType>(false, Vault.StandardInvocator.ErrorGetDefaultResponeMessage);
+                return new BaseResponse<BaseResponseGenericType>(false, Vault.VStandardInvocator.ErrorGetDefaultResponeMessage);
             });
         }
     }
