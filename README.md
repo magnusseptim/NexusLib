@@ -3,7 +3,7 @@ Azure DB client which is used by me basically
 to test new-learned features founded in Azure platform 
 (for this moment strongly focused on CosmosDB)
 
-#TODO list:
+# TODO list:
 - [ ] Test base client functionalites
 - [ ] Test sequence operations
 - [ ] Test ResultRetriever method
